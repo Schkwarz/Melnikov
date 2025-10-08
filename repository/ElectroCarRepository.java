@@ -5,13 +5,13 @@ import models.ElectroCar;
 import java.util.*;
 
 public class ElectroCarRepository implements Repository<ElectroCar, Integer> {
-    private Map<Integer, ElectroCar> electroCars = new HashMap<>();
+    private List<ElectroCar> electroCars = new ArrayList<>();
     private int nextId = 1;
 
     @Override
     public ElectroCar save(ElectroCar entity) {
         if (entity != null) {
-            electroCars.put(nextId++, entity);
+            electroCars.add(entity);
             return entity;
         }
         return null;
@@ -28,12 +28,17 @@ public class ElectroCarRepository implements Repository<ElectroCar, Integer> {
 
     @Override
     public Optional<ElectroCar> findById(Integer id) {
-        return Optional.ofNullable(electroCars.get(id));
+        if (id >= 1 && id <= electroCars.size()) {
+            return Optional.of(electroCars.get(id - 1));
+        }
+        return Optional.empty();
     }
 
     @Override
     public void deleteById(Integer id) {
-        electroCars.remove(id);
+        if (id >= 1 && id <= electroCars.size()) {
+            electroCars.remove(id - 1);
+        }
     }
 
     @Override
@@ -48,12 +53,12 @@ public class ElectroCarRepository implements Repository<ElectroCar, Integer> {
 
     @Override
     public boolean existsById(Integer id) {
-        return electroCars.containsKey(id);
+        return id >= 1 && id <= electroCars.size();
     }
 
     public List<ElectroCar> findByMinBatteryCapacity(int minCapacity) {
         List<ElectroCar> result = new ArrayList<>();
-        for (ElectroCar car : electroCars.values()) {
+        for (ElectroCar car : electroCars) {
             if (car.batteryCapacity >= minCapacity) {
                 result.add(car);
             }
@@ -63,7 +68,7 @@ public class ElectroCarRepository implements Repository<ElectroCar, Integer> {
 
     public List<ElectroCar> findByBrand(String brand) {
         List<ElectroCar> result = new ArrayList<>();
-        for (ElectroCar car : electroCars.values()) {
+        for (ElectroCar car : electroCars) {
             if (car.brand.equalsIgnoreCase(brand)) {
                 result.add(car);
             }
@@ -72,6 +77,6 @@ public class ElectroCarRepository implements Repository<ElectroCar, Integer> {
     }
 
     public List<ElectroCar> findAll() {
-        return new ArrayList<>(electroCars.values());
+        return new ArrayList<>(electroCars);
     }
 }
