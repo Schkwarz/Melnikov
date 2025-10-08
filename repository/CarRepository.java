@@ -5,13 +5,13 @@ import models.Car;
 import java.util.*;
 
 public class CarRepository implements Repository<Car, Integer> {
-    private Map<Integer, Car> cars = new HashMap<>();
+    private List<Car> cars = new ArrayList<>();
     private int nextId = 1;
 
     @Override
     public Car save(Car entity) {
         if (entity != null) {
-            cars.put(nextId++, entity);
+            cars.add(entity);
             return entity;
         }
         return null;
@@ -28,12 +28,17 @@ public class CarRepository implements Repository<Car, Integer> {
 
     @Override
     public Optional<Car> findById(Integer id) {
-        return Optional.ofNullable(cars.get(id));
+        if (id >= 1 && id <= cars.size()) {
+            return Optional.of(cars.get(id - 1));
+        }
+        return Optional.empty();
     }
 
     @Override
     public void deleteById(Integer id) {
-        cars.remove(id);
+        if (id >= 1 && id <= cars.size()) {
+            cars.remove(id - 1);
+        }
     }
 
     @Override
@@ -48,12 +53,12 @@ public class CarRepository implements Repository<Car, Integer> {
 
     @Override
     public boolean existsById(Integer id) {
-        return cars.containsKey(id);
+        return id >= 1 && id <= cars.size();
     }
 
     public List<Car> findByBrand(String brand) {
         List<Car> result = new ArrayList<>();
-        for (Car car : cars.values()) {
+        for (Car car : cars) {
             if (car.brand.equalsIgnoreCase(brand)) {
                 result.add(car);
             }
@@ -62,6 +67,6 @@ public class CarRepository implements Repository<Car, Integer> {
     }
 
     public List<Car> findAll() {
-        return new ArrayList<>(cars.values());
+        return new ArrayList<>(cars);
     }
 }
